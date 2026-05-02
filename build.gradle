@@ -1,0 +1,73 @@
+// Dependencies
+buildscript {
+    dependencies {
+        classpath 'com.github.gatooooooo:ForgeGradle:FG_2.1-SNAPSHOT' // Makes ForgeGradle work with Gradle 6
+        classpath 'com.github.xcfrg:mixingradle:ae2a80e' // Makes MixinGradle work with ForgeGradle 2.1 (Minecraft 1.8)
+    }
+}
+plugins { id "java" }
+
+apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'org.spongepowered.mixin'
+
+repositories {
+    mavenCentral()
+
+    gradlePluginPortal()
+    maven { url = "https://repo.spongepowered.org/repository/maven-public/" }
+    maven { url = "https://jitpack.io/" }
+    maven { url = "https://maven.minecraftforge.net/" }
+}
+
+// Mixin
+dependencies {
+    implementation "org.spongepowered:mixin:0.7.11-SNAPSHOT"
+    annotationProcessor "org.spongepowered:mixin:0.7.11-SNAPSHOT"
+}
+
+mixin {
+    disableRefMapWarning = true
+    defaultObfuscationEnv searge
+    add sourceSets.main, refmap
+}
+
+jar {
+    manifest {
+        attributes(
+                "MC-VERSION": "1.8.9",
+                "FMLCorePlugin": core_plugin,
+                "FMLCorePluginContainsFMLMod": "true"
+        )
+    }
+}
+
+// Minecraft
+minecraft {
+    version = "1.8.9-11.15.1.2318-1.8.9"
+    runDir = "run"
+    mappings = "stable_22"
+    makeObfSourceJar = false
+    clientJvmArgs += ["-Dfml.coreMods.load=" + core_plugin]
+}
+
+// Expand ${version} in mcmod.info
+processResources {
+    inputs.property "version", project.version
+
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+        expand 'version': project.version
+    }
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+
+// Java
+sourceCompatibility = targetCompatibility = 1.8
+compileJava.options.encoding = "UTF-8"
+
+// Hotfix for bug in ForgeGradle (runClient only depends on apiClasses, not classes)
+sourceSets.api.java.srcDirs = sourceSets.main.java.srcDirs
+sourceSets.api.resources.srcDirs = sourceSets.main.resources.srcDirs

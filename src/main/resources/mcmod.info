@@ -1,0 +1,16 @@
+[
+  {
+    "modid": "examplemod",
+    "name": "Example Mod",
+    "description": "Forge 1.8.9 mod with Mixin support.",
+    "version": "${version}",
+    "mcversion": "1.8.9",
+    "url": "",
+    "updateUrl": "",
+    "authorList": ["L3g7"],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]
